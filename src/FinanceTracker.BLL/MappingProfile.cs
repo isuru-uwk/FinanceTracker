@@ -8,9 +8,11 @@ namespace FinanceTracker.BLL
     {
         public MappingProfile()
         {
-            CreateMap<TransactionWriteModel, Transaction>();
+            CreateMap<TransactionWriteModel, Transaction>()
+                 .ForMember(d => d.CreatedDate, opt => opt.MapFrom(_ => DateTimeOffset.UtcNow));
+
             CreateMap<Transaction, TransactionReadModel>();
-                //.ForMember(d => d.CreatedDate, opt => opt.MapFrom(_ => DateTimeOffset.UtcNow));
+            CreateMap<Category, CategoryReadModel>();
         }
     }
 }

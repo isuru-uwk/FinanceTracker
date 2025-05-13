@@ -41,7 +41,7 @@ namespace FinanceTracker.Api.Controllers
         /// <response code="500">If there was an internal server error</response>
         [EndpointSummary("Get Transaction")]
         [Description("Endpoint that get a transaction")]
-        [HttpGet("{transactionId}",Name = nameof(GetTransaction))]
+        [HttpGet("{transactionId:int}", Name = nameof(GetTransaction))]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesDefaultResponseType]
@@ -108,7 +108,7 @@ namespace FinanceTracker.Api.Controllers
         /// <response code="500">If there was an internal server error</response>
         [EndpointSummary("Update Transaction")]
         [Description("Endpoint that updates a transaction")]
-        [HttpPut(Name = nameof(UpdateTransaction))]
+        [HttpPut("{transactionId:int}", Name = nameof(UpdateTransaction))]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesDefaultResponseType]

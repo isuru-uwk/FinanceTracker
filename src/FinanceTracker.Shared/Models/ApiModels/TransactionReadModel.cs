@@ -9,6 +9,6 @@ namespace FinanceTracker.Shared.Models.ApiModels
         public required decimal Amount { get; init; }
         public required DateTimeOffset TransactionDate { get; init; }
         public TransactionType Type { get; init; }
-        public required string Category { get; init; }
+        public required int CategoryId { get; init; }
     }
 }

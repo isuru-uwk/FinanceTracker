@@ -11,6 +11,7 @@ namespace FinanceTracker.BLL
         {
             services.AddAutoMapper(typeof(MappingProfile));
             services.AddScoped<ITransactionService, TransactionService>();
+            services.AddScoped<ICategoryService, CategoryService>();
         }
     }
 }

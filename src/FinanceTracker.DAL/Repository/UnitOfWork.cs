@@ -13,6 +13,11 @@ namespace FinanceTracker.DAL.Repository
         public IGenericRepository<Transaction> Transactions =>
             _transactions ??= new GenericRepository<Transaction>(_context);
 
+        private IGenericRepository<Category>? _categories;
+
+        public IGenericRepository<Category> Categories =>
+            _categories ??= new GenericRepository<Category>(_context);
+
         public async Task<int> SaveChangesAsync()
         {
             try

@@ -21,6 +21,7 @@ namespace FinanceTracker.Shared.Models.ApiModels
         [Required(ErrorMessage = "Transaction type is required")]
         public TransactionType Type { get; set; }
 
-        public required string Category { get; init; }
+        [Required(ErrorMessage = "Category is required")]
+        public required int CategoryId { get; set; }
     }
 }
