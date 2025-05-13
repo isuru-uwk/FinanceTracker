@@ -30,7 +30,7 @@ A Blazor WebAssembly application with ASP.NET Core API backend for managing and 
 | **SQL Server**   | Relational database                    |
 
 ---
-
+```
 ## 🧩 Project Structure
 
 📁 PersonalFinanceTracker/
@@ -45,6 +45,7 @@ A Blazor WebAssembly application with ASP.NET Core API backend for managing and 
 ├── PersonalFinanceTracker.sln # Solution file
 └── README.md
 
+```
 ---
 
 ## ⚙️ Getting Started
@@ -69,14 +70,14 @@ cd personal-finance-tracker
 Run the API Server
 
 ```bash
-cd PersonalFinanceTracker.Api
+cd FinanceTracker.Api
 dotnet run
 ```
 
 Run the Blazor App
 
 ```bash
-cd PersonalFinanceTracker.App
+cd FinanceTracker.App
 dotnet run
 ```
 
