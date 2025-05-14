@@ -81,3 +81,13 @@ cd FinanceTracker.App
 dotnet run
 ```
 
+```
+Future Plans
+
+Complete the Delete Functionalaty
+Migrate to .Net9 -> update swagger
+Add Odata for filering and pagination
+Add Facade layer to DAL (Prevent Entity model access from API)
+
+```
+
