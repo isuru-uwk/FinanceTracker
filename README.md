@@ -62,7 +62,7 @@ A Blazor WebAssembly application with ASP.NET Core API backend for managing and 
 
 ```bash
 git https://github.com/isuru-uwk/FinanceTracker.git
-cd personal-finance-tracker
+cd FinanceTracker
 ```
 
 2. **Clone the repository**
