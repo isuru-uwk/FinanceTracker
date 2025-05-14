@@ -25,6 +25,7 @@ namespace FinanceTracker.Api.Controllers
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         [ProducesDefaultResponseType]
+        //update with Odata
         public async Task<ActionResult<IReadOnlyCollection<TransactionReadModel>>> GetTransactions()
         {
             var result = await transactionService.GetAllTransactionsAsync();

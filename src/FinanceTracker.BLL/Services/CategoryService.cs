@@ -5,7 +5,7 @@ using FinanceTracker.Shared.Models.ApiModels;
 
 namespace FinanceTracker.BLL.Services
 {
-    internal class CategoryService(IUnitOfWork uow, IMapper mapper) : ICategoryService
+    public class CategoryService(IUnitOfWork uow, IMapper mapper) : ICategoryService
     {
         public async Task<IEnumerable<CategoryReadModel>> GetAllCategoriesAsync()
         {

@@ -6,7 +6,7 @@ using FinanceTracker.Shared.Models.ApiModels;
 
 namespace FinanceTracker.BLL.Services
 {
-    internal class TransactionService(IUnitOfWork uow, IMapper mapper) : ITransactionService
+    public class TransactionService(IUnitOfWork uow, IMapper mapper) : ITransactionService
     {
         public async Task<int> CreateTransactionAsync(TransactionWriteModel writeModel)
         {
