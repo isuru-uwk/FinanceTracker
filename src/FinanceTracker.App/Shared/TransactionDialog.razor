@@ -1,0 +1,76 @@
+﻿@using System.ComponentModel.DataAnnotations
+
+<MudDialog>
+    <DialogContent>
+        <MudForm @ref="transactionForm" Model="Transaction" Validations="transactionFormValidations">
+
+            <MudText Typo="Typo.h6">Add Transaction</MudText>
+
+            <MudTextField @bind-Value="Transaction.Description" Label="Description" Required="true" />
+            <MudNumericField @bind-Value="Transaction.Amount" Label="Amount" Required="true" />
+            <MudDatePicker Date="Transaction.TransactionDate"
+                           DateChanged="OnDateChanged"
+                           Label="Date" />
+            <MudSelect @bind-Value="Transaction.Type" Label="Type">
+                <MudSelectItem Value="TransactionType.Income">Income</MudSelectItem>
+                <MudSelectItem Value="TransactionType.Expense">Expense</MudSelectItem>
+            </MudSelect>
+            <MudSelect T="int"
+                       Label="Category"
+                       @bind-Value="Transaction.CategoryId"
+                       Required="true">
+                @foreach (var category in Categories)
+                {
+                    <MudSelectItem Value="@category.CategoryId">@category.Name</MudSelectItem>
+                }
+            </MudSelect>
+        </MudForm>
+    </DialogContent>
+    <DialogActions>
+        <MudButton OnClick="SubmitAsync" Color="Color.Primary">Save</MudButton>
+        <MudButton OnClick="Cancel">Cancel</MudButton>
+    </DialogActions>
+</MudDialog>
+
+
+@code {
+    [Inject] private HttpClient _httpClient { get; set; } = default!;
+    [Inject] private ISnackbar _snackbar { get; set; } = default!;
+    [Inject] private ITransactionApiService _transactionApiService { get; set; } = default!;
+    [Inject] private ICategoryApiService _categoryApiService { get; set; } = default!;
+
+    [CascadingParameter] IMudDialogInstance MudDialog { get; set; } = default!;
+
+    [Parameter] public TransactionWriteModel Transaction { get; set; } = default!;
+    [Parameter] public IEnumerable<CategoryReadModel> Categories { get; set; } = default!;
+    private MudForm transactionForm = default!;
+
+
+    private void OnDateChanged(DateTime? newDate)
+    {
+        Transaction.TransactionDate = newDate ?? DateTime.Now;
+    }
+
+    private async Task SubmitAsync()
+    {
+        if (!transactionForm.IsValid)
+        {
+            return;
+        }
+
+        var isSuccess = Transaction.TransactionId == 0 ? await _transactionApiService.CreateTransactionAsync(Transaction) :
+        await _transactionApiService.UpdateTransactionAsync(Transaction);
+
+        if (isSuccess)
+        {
+            _snackbar.Add("Transaction saved successfully", Severity.Success);
+            MudDialog.Close(DialogResult.Ok(Transaction));
+        }
+        else
+        {
+            _snackbar.Add("Failed to save transaction.", Severity.Error);
+        }
+    }
+
+    private void Cancel() => MudDialog.Cancel();
+}

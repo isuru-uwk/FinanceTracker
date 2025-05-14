@@ -21,10 +21,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="ApiTests\" />
-  </ItemGroup>
-
-  <ItemGroup>
     <ProjectReference Include="..\FinanceTracker.BLL\FinanceTracker.BLL.csproj" />
     <ProjectReference Include="..\FinanceTracker.DAL\FinanceTracker.DAL.csproj" />
     <ProjectReference Include="..\FinanceTracker.Shared\FinanceTracker.Shared.csproj" />

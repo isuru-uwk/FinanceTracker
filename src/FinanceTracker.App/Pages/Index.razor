@@ -1,0 +1,226 @@
+﻿@page "/"
+@using FinanceTracker.App.Shared
+
+@inject ITransactionApiService TransactionService
+@inject ICategoryApiService CategoryApiService
+@inject IDialogService DialogService
+@inject ISnackbar Snackbar
+
+<PageTitle>Dashboard - Personal Finance Tracker</PageTitle>
+
+<MudText Typo="Typo.h3" GutterBottom="true">Dashboard</MudText>
+
+@if (_isLoading)
+{
+    <MudProgressCircular Color="Color.Primary" Indeterminate="true" />
+}
+else
+{
+    <MudGrid>
+        <MudItem xs="12" sm="4">
+            <MudPaper Elevation="2" Class="pa-4" Style="height: 100%;">
+                <MudText Typo="Typo.h5">Total Income</MudText>
+                <MudText Typo="Typo.h4" Color="Color.Success">@_summary.TotalIncome.ToString("C")</MudText>
+            </MudPaper>
+        </MudItem>
+        <MudItem xs="12" sm="4">
+            <MudPaper Elevation="2" Class="pa-4" Style="height: 100%;">
+                <MudText Typo="Typo.h5">Total Expenses</MudText>
+                <MudText Typo="Typo.h4" Color="Color.Error">@_summary.TotalExpenses.ToString("C")</MudText>
+            </MudPaper>
+        </MudItem>
+        <MudItem xs="12" sm="4">
+            <MudPaper Elevation="2" Class="pa-4" Style="height: 100%;">
+                <MudText Typo="Typo.h5">Net Savings</MudText>
+                <MudText Typo="Typo.h4" Color="@(_summary.Savings >= 0 ? Color.Success : Color.Error)">
+                    @_summary.Savings.ToString("C")
+                </MudText>
+            </MudPaper>
+        </MudItem>
+    </MudGrid>
+
+    <MudText Typo="Typo.h5" Class="mt-6 mb-3">Recent Transactions</MudText>
+
+    @if (!_transactions.Any())
+    {
+        <MudAlert Severity="Severity.Info">No transactions found. Add some to get started!</MudAlert>
+    }
+    else
+    {
+        <MudCard Elevation="3">
+            <MudTable Items="@_recentTransactions" Hover="true" Dense="true">
+                <HeaderContent>
+                    <MudTh>Date</MudTh>
+                    <MudTh>Description</MudTh>
+                    <MudTh>Category</MudTh>
+                    <MudTh>Type</MudTh>
+                    <MudTh Style="text-align: right">Amount</MudTh>
+                    <MudTh Style="text-align: right">Actions</MudTh>
+
+                </HeaderContent>
+                <RowTemplate>
+                    <MudTd DataLabel="Date">@context.TransactionDate</MudTd>
+                    <MudTd DataLabel="Description">@context.Description</MudTd>
+                    <MudTd DataLabel="Category"> @_categories.FirstOrDefault(c => c.CategoryId == context.CategoryId)?.Name</MudTd>
+                    <MudTd DataLabel="Type">@context.Type</MudTd>
+                    <MudTd DataLabel="Amount" Style="text-align: right">
+                        <MudText Color="@(context.Type == TransactionType.Income ? Color.Success : Color.Error)">
+                            @context.Amount.ToString("C")
+                        </MudText>
+                    </MudTd>
+                    <MudTd Style="text-align: right">
+                        <MudIconButton Icon="@Icons.Material.Filled.Edit"
+                                       Color="Color.Primary"
+                                       OnClick="@(() => EditTransaction(context.TransactionId))" />
+                    </MudTd>
+                </RowTemplate>
+            </MudTable>
+        </MudCard>
+    }
+    <MudButton Class="mt-4" Variant="Variant.Filled" Color="Color.Primary"
+               StartIcon="@Icons.Material.Filled.Add"
+               OnClick="AddTransaction">Add Transaction</MudButton>
+}
+
+@code {
+    private bool _isLoading = true;
+    private IReadOnlyCollection<TransactionReadModel> _transactions = [];
+    private IReadOnlyCollection<TransactionReadModel> _recentTransactions = [];
+    private TransactionSummaryReadModel _summary = default!;
+    IEnumerable<CategoryReadModel> _categories = [];
+
+    protected override async Task OnInitializedAsync()
+    {
+        await LoadCategoriesAsync();
+        await LoadDashboardDataAsync();
+    }
+
+    private async Task LoadCategoriesAsync()
+    {
+        try
+        {
+            _isLoading = true;
+
+            // Load all categories
+            var result = await CategoryApiService.GetCategoriesAsync() ?? new List<CategoryReadModel>();
+            _categories = result;
+        }
+        catch (Exception ex)
+        {
+            Snackbar.Add($"Error loading category data: {ex.Message}", Severity.Error);
+        }
+        finally
+        {
+            _isLoading = false;
+        }
+    }
+
+    private async Task LoadDashboardDataAsync()
+    {
+        try
+        {
+            _isLoading = true;
+
+            // Load all transactions
+            var result = await TransactionService.GetTransactionsAsync() ?? new List<TransactionReadModel>();
+            _transactions = result;
+
+            // Get recent transactions (last 5)
+            _recentTransactions = _transactions
+                .OrderByDescending(t => t.TransactionDate)
+                .Take(5)
+                .ToList();
+
+            // Calculate financial summary
+            CalculateFinancialSummary();
+        }
+        catch (Exception ex)
+        {
+            Snackbar.Add($"Error loading dashboard data: {ex.Message}", Severity.Error);
+        }
+        finally
+        {
+            _isLoading = false;
+        }
+    }
+
+    private void CalculateFinancialSummary()
+    {
+        decimal totalIncome = _transactions
+            .Where(t => t.Type == TransactionType.Income)
+            .Sum(t => t.Amount);
+
+        decimal totalExpenses = _transactions
+            .Where(t => t.Type == TransactionType.Expense)
+            .Sum(t => t.Amount);
+
+        _summary = new TransactionSummaryReadModel
+            {
+                TotalIncome = totalIncome,
+                TotalExpenses = totalExpenses,
+                Savings = totalIncome - totalExpenses
+            };
+    }
+
+    private async Task AddTransaction()
+    {
+        var parameters = new DialogParameters
+        {
+            { "Transaction", new TransactionWriteModel
+                {
+                    Amount = 0,
+                    CategoryId = 0,
+                    Description = "",
+                    TransactionDate = DateTime.UtcNow,
+                    TransactionId = 0,
+                    Type = TransactionType.Income
+                }
+            },
+            { "Categories", _categories
+            }
+        };
+
+        var result = await this.OpenAddDialog(parameters);
+
+        if (!result?.Canceled ?? false)
+        {
+            await LoadDashboardDataAsync();
+        }
+    }
+
+    private async Task<DialogResult?> OpenAddDialog(DialogParameters parameters)
+    {
+        var options = new DialogOptions { CloseButton = true, MaxWidth = MaxWidth.Small, FullWidth = true };
+
+        var dialog = await DialogService.ShowAsync<TransactionDialog>("Add Transaction", parameters, options);
+        return await dialog.Result;
+    }
+
+    private async Task EditTransaction(int transactionId)
+    {
+        var transaction = await TransactionService.GetTransactionAsync(transactionId);
+
+        var parameters = new DialogParameters
+        {
+            { "Transaction", new TransactionWriteModel
+                {
+                    Amount = transaction.Amount,
+                    CategoryId = transaction.CategoryId,
+                    Description = transaction.Description,
+                    TransactionDate = transaction.TransactionDate!.DateTime,
+                    TransactionId = transaction.TransactionId,
+                    Type = TransactionType.Income
+                }
+            },
+            { "Categories", _categories
+            }
+        };
+
+        var result = await this.OpenAddDialog(parameters);
+
+        if (!result?.Canceled ?? false)
+        {
+            await LoadDashboardDataAsync();
+        }
+    }
+}
