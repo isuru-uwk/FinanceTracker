@@ -33,6 +33,7 @@ A Blazor WebAssembly application with ASP.NET Core API backend for managing and 
 ```
 ## 🧩 Project Structure
 
+
 📁 PersonalFinanceTracker/
 │
 ├── 📁 FinanceTracker.App # Blazor frontend
@@ -45,6 +46,7 @@ A Blazor WebAssembly application with ASP.NET Core API backend for managing and 
 ├── PersonalFinanceTracker.sln # Solution file
 └── README.md
 
+Follows a Layered (N-tier) Architecture with a modular design pattern
 ```
 ---
 
@@ -82,12 +84,12 @@ dotnet run
 ```
 
 ```
-Future Plans
+Planned Improvements
 
 Complete the Delete Functionalaty
 Migrate to .Net9 -> update swagger
 Add Odata for filering and pagination
-Add Facade layer to DAL (Prevent Entity model access from API)
+Add a facade layer to DAL (Prevent Entity model access from API)
 Add SQL Auth
 
 ```
